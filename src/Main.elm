@@ -1,23 +1,19 @@
 module Main exposing (..)
 
--- Press buttons to increment and decrement a counter.
---
--- Read how it works:
---   https://guide.elm-lang.org/architecture/buttons.html
---
-
-
 import Browser
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Css exposing (..)
+import Html
+--exposing (Html, Attribute, div, input, text, button)
+import Html.Styled exposing (..)
+import Html.Styled.Attributes exposing (css, style, checked, class, for, id, name, type_, value, placeholder)
+import Html.Styled.Events exposing (onInput, onClick)
 
 
 -- MAIN
 
-
+main : Program () Board Msg
 main =
-  Browser.sandbox { init = init, update = update, view = view }
+  Browser.sandbox { init = init, update = update, view = view >> toUnstyled }
 
 
 
@@ -97,9 +93,9 @@ update msg board =
 view : Board -> Html Msg
 view board =
   let cCard = board.currentCard in
-  div []
+  div [style "background-color" "red"]
     [ div [] [ text "感謝の気持ちを伝えよう" ]
-      ,viewInput "text" "ボードのタイトル" board.boardTitle UpdateBoardTitle
+      , viewInput "text" "ボードのタイトル" board.boardTitle UpdateBoardTitle
       , button [ onClick CreateBoard ] [ text "Board++" ]
       , div [] [ viewInput "text" "カードのタイトル" cCard.title UpdateCardTitle]
       , div [] [ viewInput "text" "カードの中身" cCard.contents UpdateCardContent]
@@ -110,3 +106,15 @@ view board =
 viewInput : String -> String -> String -> (String -> msg) -> Html msg
 viewInput t p v toMsg =
   input [ type_ t, placeholder p, value v, onInput toMsg ] []
+
+
+-- Style
+type alias Theme =
+  { background : {default : Color }
+  }
+
+
+theme : Theme
+theme =
+  { background = {default = rgb 0 255 0 }
+  }
