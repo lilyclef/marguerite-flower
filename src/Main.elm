@@ -13,7 +13,6 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 
 
-
 -- MAIN
 
 
@@ -34,6 +33,7 @@ type alias Board = {
       ,creatorId : String
       ,cardLst : List Card
       ,boardTitle : String
+      ,currentCard : Card
   }
 
 type Writer
@@ -42,13 +42,20 @@ type Writer
       ,name : String
   }
 
-type Card
-  = Card {
+type alias Card = {
     cardId : String
     ,boardId : String
     ,writerId : String
     ,title : String
     ,contents : String
+  }
+
+iniCard = {
+  cardId = "000"
+  ,boardId = "0"
+  ,writerId = "0"
+  ,title = ""
+  ,contents = ""
   }
 
 init : Board
@@ -57,6 +64,7 @@ init = {
   ,boardTitle = ""
   ,creatorId = "0"
   ,cardLst = []
+  ,currentCard = iniCard
   }
 
 
@@ -69,6 +77,7 @@ type Msg
   | CreateCard
   | UpdateCardTitle String
   | UpdateBoardTitle String
+  | UpdateCardContent String
 
 
 update : Msg -> Board -> Board
@@ -76,6 +85,8 @@ update msg board =
   case msg of
     UpdateBoardTitle boardTitle ->
       {board | boardTitle = boardTitle}
+    -- UpdateCardTitle cardTitle ->
+    --  {board | currentCard.title = cardTitle}
     _ -> board
 
 
@@ -85,10 +96,14 @@ update msg board =
 
 view : Board -> Html Msg
 view board =
+  let cCard = board.currentCard in
   div []
     [ div [] [ text "感謝の気持ちを伝えよう" ]
       ,viewInput "text" "ボードのタイトル" board.boardTitle UpdateBoardTitle
-    
+      , button [ onClick CreateBoard ] [ text "Board++" ]
+      , div [] [ viewInput "text" "カードのタイトル" cCard.title UpdateCardTitle]
+      , div [] [ viewInput "text" "カードの中身" cCard.contents UpdateCardContent]
+      , button [ onClick CreateCard ] [ text "Card++" ]
     ]
 
 
