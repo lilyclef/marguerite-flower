@@ -3,7 +3,7 @@ module Main exposing (..)
 import Browser
 import Css exposing (..)
 import Html
-import Html.Styled exposing (Html, div, text, h1, input, button, toUnstyled)
+import Html.Styled exposing (Html, div, text, h1, input, button, textarea, toUnstyled, hr)
 import Html.Styled.Attributes exposing (css, style, checked, class, for, id, name, type_, value, placeholder)
 import Html.Styled.Events exposing (onInput, onClick)
 
@@ -99,17 +99,20 @@ update msg board =
 view : Board -> Html Msg
 view board =
   let cCard = board.currentCard in
+  let cardTitleTheme = (onInput UpdateCardTitle) :: (value cCard.cardTitle) :: theme.cardTitle in
+  let cardContentsTheme = (value cCard.contents) :: (onInput UpdateCardContents) :: theme.cardContents in
+  let cardButtonTheme = (onClick CreateCard) :: theme.cardButton in
   div theme.body
     [ div theme.main [ 
         h1 [] [text "感謝の気持ちを伝えよう" ]
       , viewInput "text" "ボードのタイトル" board.boardTitle UpdateBoardTitle
       , button [ onClick CreateBoard ] [ text "Board++" ]
       , div theme.card [
-          div [] [ viewInput "text" "カードのタイトル" cCard.cardTitle UpdateCardTitle]
-        , div [] [ viewInput "text" "カードの中身" cCard.contents UpdateCardContents]
-        , div [] [ viewInput "text" "名前" cCard.writerId UpdateWriterName]
+          div [] [ input cardTitleTheme [] ]
+        , hr [] []
+        , div [] [ textarea cardContentsTheme [] ]
+        , div [] [ button cardButtonTheme [ text "完成" ]] ]
       ]
-      , button [ onClick CreateCard ] [ text "Card++" ]]
     ]
 
 
@@ -123,6 +126,10 @@ type alias Theme =
   { body : List (Html.Styled.Attribute Msg)
     , main : List (Html.Styled.Attribute Msg)
     , card : List (Html.Styled.Attribute Msg)
+    , cardContents : List (Html.Styled.Attribute Msg)
+    , cardTitle : List (Html.Styled.Attribute Msg)
+    , cardButton : List (Html.Styled.Attribute Msg)
+    , boardTitle : List (Html.Styled.Attribute Msg)
   }
 
 
@@ -132,7 +139,7 @@ theme =
             , style "width" "100vw"
             , style "height" "100vh"
             , style "font-family" "'Kiwi Maru'"
-            , style "padding" "10px"]
+            , style "padding" "10px" ]
     , main = [ style "display" "block"
               , style "margin-left" "auto"
               , style "margin-right" "auto"
@@ -140,12 +147,33 @@ theme =
               , style "width" "60vw"
               , style "height" "90vh"
               , style "padding" "5px"
-              , style "text-align" "center"]
-    , card = [ style "background-color" "#ede4e1"
-              , style "width" "300px"
-              , style "height" "300px"
+              , style "text-align" "center" ]
+    , card = [ style "width" "300px"
+              , style "height" "320px"
+              -- , style "background-color" "#ede4e1"
               , style "padding" "10px"
               , style "border" "solid"
               , style "border-color" "#ADADC9"
-              , style "border-radius" "5px"]
+              , style "border-radius" "5px" ]
+    , cardContents = [ placeholder "カードの中身"
+                      , style "width" "100%"
+                      , style "height" "230px"
+                      , style "border" "none"
+                      , style "margin" "1px"
+                      -- , style "background" "yellow"
+                      , style "outline" "none"
+                      , style "resize" "none" ]
+    , cardTitle = [ type_ "text"
+                  , placeholder "カードのタイトル"
+                  , style "width" "100%"
+                  , style "border" "none"
+                  , style "margin" "5px"
+                  , style "background" "transparent"
+                  , style "outline" "none" ]
+    , cardButton = [ style "width" "250px"
+                   , style "border" "none"
+                   , style "border-radius" "10px"
+                   , style "background" "PowderBlue"
+                   ]
+    , boardTitle = [ style "width" "80px" ]
   }
