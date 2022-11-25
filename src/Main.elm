@@ -74,21 +74,25 @@ type Msg
   | UpdateBoardTitle String
   | UpdateCardContents String
   | UpdateWriterName String
+  | RegisterCard
 
 
 update : Msg -> Board -> Board
 update msg board = 
   case msg of
     UpdateBoardTitle t ->
-      {board | boardTitle = t}
+      { board | boardTitle = t }
     UpdateCardTitle t ->
       let cCard = board.currentCard in
-      let uCard = { cCard | cardTitle = t} in
-      {board | currentCard = uCard}
+      let uCard = { cCard | cardTitle = t } in
+      { board | currentCard = uCard }
     UpdateCardContents c ->
       let cCard = board.currentCard in
-      let uCard = { cCard | contents = c} in
-      {board | currentCard = uCard }
+      let uCard = { cCard | contents = c } in
+      { board | currentCard = uCard }
+    RegisterCard ->
+      { board | cardLst = board.currentCard :: board.cardLst}
+
     _ -> board
 
 
@@ -98,20 +102,13 @@ update msg board =
 
 view : Board -> Html Msg
 view board =
-  let cCard = board.currentCard in
-  let cardTitleTheme = (onInput UpdateCardTitle) :: (value cCard.cardTitle) :: theme.cardTitle in
-  let cardContentsTheme = (value cCard.contents) :: (onInput UpdateCardContents) :: theme.cardContents in
-  let cardButtonTheme = (onClick CreateCard) :: theme.cardButton in
   div theme.body
     [ div theme.main [ 
-        h1 [] [text "感謝の気持ちを伝えよう" ]
+        h1 [] [text "寄せ書きしよう" ]
       , viewInput "text" "ボードのタイトル" board.boardTitle UpdateBoardTitle
       , button [ onClick CreateBoard ] [ text "Board++" ]
-      , div theme.card [
-          div [] [ input cardTitleTheme [] ]
-        , hr [] []
-        , div [] [ textarea cardContentsTheme [] ]
-        , div [] [ button cardButtonTheme [ text "完成" ]] ]
+      , div [] [ viewCard board.currentCard]
+      , div [] (List.map viewCard board.cardLst)
       ]
     ]
 
@@ -119,6 +116,17 @@ view board =
 viewInput : String -> String -> String -> (String -> msg) -> Html msg
 viewInput t p v toMsg =
   input [ type_ t, placeholder p, value v, onInput toMsg ] []
+
+viewCard : Card -> Html Msg
+viewCard card = 
+  let cardTitleTheme = (onInput UpdateCardTitle) :: (value card.cardTitle) :: theme.cardTitle in
+  let cardContentsTheme = (value card.contents) :: (onInput UpdateCardContents) :: theme.cardContents in
+  let cardButtonTheme = (onClick RegisterCard) :: theme.cardButton in
+  div theme.card [
+          div [] [ input cardTitleTheme [] ]
+        , hr [] []
+        , div [] [ textarea cardContentsTheme [] ]
+        , div [] [ button cardButtonTheme [ text "完成" ]] ]
 
 
 -- Style
@@ -152,9 +160,11 @@ theme =
               , style "height" "320px"
               -- , style "background-color" "#ede4e1"
               , style "padding" "10px"
+              , style "margin" "5px"
               , style "border" "solid"
               , style "border-color" "#ADADC9"
-              , style "border-radius" "5px" ]
+              , style "border-radius" "5px"
+              , style "float" "left" ]
     , cardContents = [ placeholder "カードの中身"
                       , style "width" "100%"
                       , style "height" "230px"
