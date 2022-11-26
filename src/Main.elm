@@ -3,7 +3,7 @@ module Main exposing (..)
 import Browser
 import Css exposing (..)
 import Html
-import Html.Styled exposing (Html, div, text, h1, input, button, textarea, toUnstyled, hr)
+import Html.Styled exposing (Html, div, text, h1, input, button, textarea, toUnstyled, hr, br)
 import Html.Styled.Attributes exposing (css, style, checked, class, for, id, name, type_, value, placeholder)
 import Html.Styled.Events exposing (onInput, onClick)
 
@@ -91,7 +91,7 @@ update msg board =
       let uCard = { cCard | contents = c } in
       { board | currentCard = uCard }
     RegisterCard ->
-      { board | cardLst = board.currentCard :: board.cardLst}
+      { board | cardLst = board.currentCard :: board.cardLst, currentCard = iniCard }
 
     _ -> board
 
@@ -106,9 +106,8 @@ view board =
     [ div theme.main [ 
         h1 [] [text "寄せ書きしよう" ]
       , viewTitle board
-      , button [ onClick CreateBoard ] [ text "Board++" ]
       , div [] [ viewCard board.currentCard]
-      , div [] (List.map viewCard board.cardLst)
+      --, div [] (List.map viewCard board.cardLst)
       ]
     ]
 
@@ -126,12 +125,13 @@ viewCard card =
           div [] [ input cardTitleTheme [] ]
         , hr [] []
         , div [] [ textarea cardContentsTheme [] ]
-        , div [] [ button cardButtonTheme [ text "完成" ]] ]
+        , div [] [ button cardButtonTheme [ text "メッセージを送る" ]] ]
 
 viewTitle : Board -> Html Msg
 viewTitle board = 
   let boardTitleTheme = (onInput UpdateBoardTitle) :: (value board.boardTitle) :: theme.boardTitle in
-  div [] [input boardTitleTheme []]
+  let buttonTheme = (onClick CreateBoard) :: theme.cardButton in
+  div theme.card [ div theme.boardTitleCover [ div [] [input boardTitleTheme [], text "さんへ"], br[][], br[][], button buttonTheme [ text "寄せ書きを作る" ]]]
 
 -- Style
 type alias Theme =
@@ -142,6 +142,7 @@ type alias Theme =
     , cardTitle : List (Html.Styled.Attribute Msg)
     , cardButton : List (Html.Styled.Attribute Msg)
     , boardTitle : List (Html.Styled.Attribute Msg)
+    , boardTitleCover : List (Html.Styled.Attribute Msg)
   }
 
 
@@ -190,9 +191,13 @@ theme =
                    , style "background" "PowderBlue"
                    ]
     , boardTitle = [ type_ "text"
-                   , placeholder "ボードのタイトル"
-                   , style "width" "200px"
-                   , style "border" "solid"
-                   , style "border-color" "#ADADC9"
-                   , style "border-radius" "5px"]
+                   , placeholder ""
+                   , style "width" "150px"
+                   , style "border" "none"
+                   , style "border-bottom" "dotted"
+                   , style "outline" "none"
+                   , style "font-size" "20px"]
+    , boardTitleCover = [ style "height" "150px"
+                        , style "padding" "80px 10px"
+                        , style "margin" "10px"]
   }
