@@ -105,7 +105,7 @@ view board =
   div theme.body
     [ div theme.main [ 
         h1 [] [text "寄せ書きしよう" ]
-      , viewInput "text" "ボードのタイトル" board.boardTitle UpdateBoardTitle
+      , viewTitle board
       , button [ onClick CreateBoard ] [ text "Board++" ]
       , div [] [ viewCard board.currentCard]
       , div [] (List.map viewCard board.cardLst)
@@ -128,6 +128,10 @@ viewCard card =
         , div [] [ textarea cardContentsTheme [] ]
         , div [] [ button cardButtonTheme [ text "完成" ]] ]
 
+viewTitle : Board -> Html Msg
+viewTitle board = 
+  let boardTitleTheme = (onInput UpdateBoardTitle) :: (value board.boardTitle) :: theme.boardTitle in
+  div [] [input boardTitleTheme []]
 
 -- Style
 type alias Theme =
@@ -185,5 +189,10 @@ theme =
                    , style "border-radius" "10px"
                    , style "background" "PowderBlue"
                    ]
-    , boardTitle = [ style "width" "80px" ]
+    , boardTitle = [ type_ "text"
+                   , placeholder "ボードのタイトル"
+                   , style "width" "200px"
+                   , style "border" "solid"
+                   , style "border-color" "#ADADC9"
+                   , style "border-radius" "5px"]
   }
